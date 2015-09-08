@@ -1,0 +1,14 @@
+Thursday September 3 2015:
+(Note, while the results where obtained on the date listed in this file, this file itself was not produced until Tuesday September 8, 2015, because I did not start putting summaries of results in github until then).
+
+The version of the code linked to this file performs a randomized dilution experiment to measure the strength of our semantic similarity metrics.
+
+The semantic similarity metric for terms is information content (IC), calculated using the total number of annotations as the corpus.
+Similarity between profiles of terms is defined as the median of the asymmetric best pairs (the best database term that matches each query term).
+
+The results are in the file similarity_dilution_results_sept3.xlsx.
+A summary of the results is below:
+1. A random query matches itself until 5 dilutions, at which point it starts to match a random profile.
+2. Generally, the median best pairs IC decreases somewhat from 0 to 4 replacements, but then drops off a bit at 5 replacements.
+3. The score then decreases slightly again and begins to level off around 8 replacements.
+
