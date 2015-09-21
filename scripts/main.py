@@ -14,10 +14,13 @@ import makeMultipleLinearModel
 
 #import getContainerMemory
 
-def main(annotation_filename,annotation_IC_filename,profile_filename,ancestor_filename):
+def main(annotation_filename,annotation_IC_filename,profile_filename,ancestor_filename,lm_filename,random_profile_filename,out_filename):
 	annotations,profile_sizes = read_files(annotation_filename,profile_filename)
 #	ancestors,children = getRelationships.get_relationships(ancestor_filename)
-	random_profiles = makeRandomProfiles.with_replacement(annotations,profile_sizes)
+	#random_profiles = makeRandomProfiles.with_replacement(annotations,profile_sizes)
+	with open(random_profile_filename,"r") as random_file:
+		random_profiles = cPickle.load(random_file)
+	num_db_profiles = len(random_profiles)
 #	unique_annotations = set(annotations)
 	with open(annotation_IC_filename,"r") as annotation_IC_file:
 		annotation_ICs = cPickle.load(annotation_IC_file)
@@ -29,29 +32,31 @@ def main(annotation_filename,annotation_IC_filename,profile_filename,ancestor_fi
 #	print len(random_profiles.values()[0])
 	del(profile_sizes)
 #	ancestors = getRelationships.get_relationships(ancestor_filename,unique_annotations)
+	with open(lm_filename,"r") as lm_file:
+		lm_results = cPickle.load(lm_file)
 	queries = getQueryProfiles.get_query_profiles(random_profiles,5,10)
 	results = []
 #	count = 0
 	for query_ID,query_terms in queries.iteritems():
 #		if count > 0:
 #			break
-		best_ID,best_IC,best_pairs = calcMedianBestIC.asymmetric_comparison(query_terms,random_profiles,annotation_ICs,ancestors)
-		results.append((query_ID,0,best_ID,best_IC,string.join([str(round(i,4)) for i in best_pairs],",")))
+		best_ID,best_IC,best_pairs,E_val = calcMedianBestIC.asymmetric_comparison(query_terms,random_profiles,annotation_ICs,ancestors,lm_results)
+		results.append((query_ID,0,best_ID,best_IC,E_val,string.join([str(round(i,4)) for i in best_pairs],",")))
 		diluted_query = diluteQuery.dilute_query(query_terms,0,annotations,query_terms,duplicates="yes")
 #		print len(diluted_query)
-		best_ID,best_IC,best_pairs = calcMedianBestIC.asymmetric_comparison(diluted_query,random_profiles,annotation_ICs,ancestors)
-		results.append((query_ID,1,best_ID,best_IC,string.join([str(round(i,4)) for i in best_pairs],",")))
+		best_ID,best_IC,best_pairs,E_val = calcMedianBestIC.asymmetric_comparison(diluted_query,random_profiles,annotation_ICs,ancestors,lm_results)
+		results.append((query_ID,1,best_ID,best_IC,E_val,string.join([str(round(i,4)) for i in best_pairs],",")))
 		for i in xrange(1,10):
 			diluted_query = diluteQuery.dilute_query(diluted_query,i,annotations,query_terms,duplicates="yes")
 #			diluted_query = diluteQuery.new_dilute_query(query_terms,i,annotations,duplicates="yes")
-			print len(diluted_query)
-			print len(query_terms)
-			best_ID,best_IC,best_pairs = calcMedianBestIC.asymmetric_comparison(diluted_query,random_profiles,annotation_ICs,ancestors)
-			results.append((query_ID,i+1,best_ID,best_IC,string.join([str(round(i,4)) for i in best_pairs],",")))
+#			print len(diluted_query)
+#			print len(query_terms)
+			best_ID,best_IC,best_pairs,E_val = calcMedianBestIC.asymmetric_comparison(diluted_query,random_profiles,annotation_ICs,ancestors,lm_results)
+			results.append((query_ID,i+1,best_ID,best_IC,E_val,string.join([str(round(i,4)) for i in best_pairs],",")))
 #			count+=1
-	with open("test.out","w") as test_file:
+	with open(out_filename,"w") as test_file:
 		for result in results:
-			test_file.write("%s\t%d\t%s\t%0.4f\t%s\n" % tuple(result))
+			test_file.write("%s\t%d\t%s\t%0.4f\t%0.8f\t%s\n" % tuple(result))
 #	query_ID = queries.keys()[0]
 #	query_terms = queries[query_ID]
 #	best_match = calcMedianBestIC.asymmetric_comparison(query_terms,random_profiles,annotation_ICs,ancestors)

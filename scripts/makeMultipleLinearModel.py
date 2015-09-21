@@ -1,9 +1,10 @@
 import random
 import collections
-import statsmodels.api as sm
-import statsmodels.stats.outliers_influence as ss
+#import statsmodels.api as sm
+#import statsmodels.stats.outliers_influence as ss
 import numpy as np
 import cPickle
+import math
 import sys
 #sys.path.append("..")
 
@@ -33,41 +34,55 @@ def make_multi_lm(profile_filename,annotation_filename,annotation_ICs_filename,a
 	
 	# Initialize lists for the x and y values.
 	# The y list will be one dimensional and the x list will be a list of two dimensional tuples.
-	y = []
-	x = []
-	# Calculate the x and y values uby querying each query profile
+#	y = []
+#	x = []
+	num_points = float(len(query_profiles)*len(db_profiles))
+#	y = np.empty(num_points,float)
+#	x = np.empty((num_points,2),float)
+	# Calculate the x and y values by querying each query profile
 	# against each database profile.
+	### Test
+	out_file = open(out_filename,"w")
+	i = 0
 	for query in query_profiles.itervalues():
+		query_log_len = math.log(len(query))
 		for db in db_profiles.itervalues():
-			similarity = None
-			x.append((np.log(len(query)),np.log(len(db))))
+#			similarity = None
+#			x.append((query_log_len,math.log(len(db))))
+#			x[i,:] = (query_log_len,np.log(len(db)))
+			out_file.write("%0.4f\t%0.4f\t" % (query_log_len,np.log(len(db))))
 			#similarity = asymmetric_comparison(query,db,annotation_ICs,ancestors)
 			best_pairs = []
 			for term1 in query:
-				MICA_IC = None
+#				MICA_IC = None
 				MICA_ICs = []
 				for term2 in db:
-					common_ancestors = set.intersection(ancestors[term1],ancestors[term2])
+					common_ancestors = ancestors[term1].intersection(ancestors[term2])
 					MICA_IC = max([annotation_ICs[term] for term in common_ancestors])
 					MICA_ICs.append(MICA_IC)
 				best_pairs.append(max(MICA_ICs))
 			similarity = np.median(best_pairs)
-			y.append(similarity)
-	
+			out_file.write("%0.4f\n" % (similarity))
+#			y.append(similarity)
+#			y[i] = similarity
+			i+=1
+	out_file.close()
+	### end test
 	# Convert the x and y lists to numpy arrays for the linear regression analysis.
-	x = np.array(x)
-	y = np.array(y)
+#	x = np.array(x)
+#	y = np.array(y)
 	# Add a column of ones to the x matrix so that the matrix algebra for the y-ointercept works.
-	x = sm.add_constant(x)
+#	x = sm.add_constant(x)
 	# Fit the multiple linear model.
-	lm = sm.OLS(y,x).fit()
+#	lm = sm.OLS(y,x).fit()
 	# Get the influence results of the model and use it to get the diagonal of the hat matrix.
-	influence = ss.OLSInfluence(lm)
-	hat_diag = influence.hat_matrix_diag
-	results = (lm.fittedvalues,lm.params,hat_diag)
-	with open(out_filename,"w") as out_file:
-		cPickle.dump(results,out_file)
-	return results
+#	influence = ss.OLSInfluence(lm)
+#	hat_diag = influence.hat_matrix_diag
+#	results = (lm.fittedvalues,lm.params,hat_diag,lm.mse_resid)
+#	with open(out_filename,"w") as out_file:
+#		cPickle.dump(results,out_file)
+#	return results
+	return
 	
 def make_random_queries(profiles,annotations):
 	"""This function generates random profile queries from the list of available annotations.
@@ -85,6 +100,7 @@ def make_random_queries(profiles,annotations):
 	# Loop through the set of profile sizes and randomly sample
 	# the corresponding number of annotations from the annotation pool.
 	for size in unique_sizes:
+#	for size in xrange(10,151,10):
 		for i in xrange(1,size+1):
 			queries[size].append(random.choice(annotations))
 	return queries

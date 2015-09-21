@@ -1,0 +1,17 @@
+Monday September 21:
+
+Design:
+This version of the code performs three major tasks:
+1. Finds the database profile with the highest similarity score to a given query profile. 
+A. The similarity between terms is measured using IC with the annotation corpus as the denominator in the IC calculation.
+B. The similarity between profiles is measured as the median of the asymmetric best pairs between terms. Asymmetric means that the term in the database profile that most closely matches each query term is computed.
+2. Calculates an expect score that measures how many database profiles equivalent in size to the matched database profile that one would expect to observe with a similarity score greater than or equal to the observed similarity score by chance.
+3. Performs a random decay experiment to test the ability of the similarity and expect scores to detect real similarity from noise:
+A. The initial similarity and expect scores between a query and its best match is observed. Initially, the query should match itself.
+B. One term is iteratively randomly replaced in the query and the similarity and expect scores are calculated at each iteration. 
+
+Results:
+1. A query stops matching itself after 4 to 5 replacements.
+2. While a query still matches itself, similarity scores generally slightly decrease and expect scores slightly increase.
+3. The similarity score drops sharply and expect score increases sharply at the replacement at which a query stops matching itself.
+4. The similarity and expect scores show no clear pattern with the number of replacements after a query stops matching itself.
