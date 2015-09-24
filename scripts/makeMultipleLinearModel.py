@@ -105,21 +105,5 @@ def make_random_queries(profiles,annotations):
 			queries[size].append(random.choice(annotations))
 	return queries
 
-def asymmetric_comparison(query_terms,db_terms,annotation_ICs,ancestors):
-	"""This function computes the IC score of the MICA between every term in profile1 with that in profile2.
-	For each term in profile1, the corresponding term in profile2 that yields the highest IC score is extracted.
-	The median of these best pairs is then calculated and returned."""
-
-	best_pairs = []
-	for term1 in query_terms:
-		MICA_IC = None
-		MICA_ICs = []
-		for term2 in db_terms:
-			common_ancestors = set.intersection(ancestors[term1],ancestors[term2])
-			MICA_IC = max([annotation_ICs[term] for term in common_ancestors])
-			MICA_ICs.append(MICA_IC)
-		best_pairs.append(max(MICA_ICs))
-	return np.median(best_pairs)
-
 if __name__ == "__main__":
 	make_multi_lm(*sys.argv[1:])

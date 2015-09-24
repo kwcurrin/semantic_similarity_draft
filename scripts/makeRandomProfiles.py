@@ -6,8 +6,8 @@ import random
 def with_replacement(annotation_filename,profile_size_filename,out_filename=None):
 	"""This function generates random profiles with the same size distribution as the real profiles.
 	The annotations that are matched to each profile are what are randomized.
-	The random sampling of annotations for a given profile is performed without replacement.
-	The random sampling between profiles is with replacement.
+	The random sampling of annotations for a given profile is performed with replacement.
+	The random sampling between profiles is without replacement.
 	This function returns a dictionary with profile IDs as keys and lists of corresponding annotations as values."""
 
 	# Read in the annotations and profile sizes.
@@ -19,10 +19,6 @@ def with_replacement(annotation_filename,profile_size_filename,out_filename=None
 	for ID,size in profile_sizes:
 		random_annotations = random.sample(annotations,size)
 		random_profiles[ID] = random_annotations
-	print "with replacement"
-	print len(random_profiles)
-	print sum([len(i) for i in random_profiles.itervalues()])
-	print sum([i[1] for i in profile_sizes])
 	if out_filename:
 		with open(out_filename,"w") as out_file:
 			cPickle.dump(random_profiles,out_file)
@@ -43,18 +39,12 @@ def without_replacement(annotation_filename,profile_filename):
 	# Generate a randomized copy of the annotations list.
 	# Note: I did not use random.shuffle because the documentation said something about permutations of large sequences not being good.
 	random_annotations = random.sample(annotations,len(annotations))
-	print "without replacement"
-	print len(random_annotations)
 	# Populate the random profiles dictionary by popping values from random_annotations.
 	# The number of pops needed will be determined from the size of the corresponding real profiles.
 	for ID,size in profile_sizes:
 		for i in xrange(size):
 			random_profiles[ID].append(random_annotations.pop())
 	# random_annotations should now be empty.
-	print len(random_annotations)
-	print len(random_profiles)
-	print sum([len(i) for i in random_profiles.itervalues()])
-	print sum([i[1] for i in profile_sizes])	
 	return random_profiles
 	
 def read_files(annotation_filename,profile_filename):
@@ -77,4 +67,3 @@ def read_files(annotation_filename,profile_filename):
 
 if __name__ == "__main__":
 	with_replacement(sys.argv[1],sys.argv[2],out_filename=sys.argv[3])
-#	without_replacement(sys.argv[1],sys.argv[2])

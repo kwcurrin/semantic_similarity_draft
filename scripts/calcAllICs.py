@@ -1,12 +1,9 @@
 import collections
 import numpy as np
-import re
 import cPickle
 import sys
 
-import getRelationships
-
-def annotation_denominator(annotation_filename,ancestor_filename,out_filename): # Used to take children as a parameter and profiles
+def annotation_denominator(annotation_filename,ancestor_filename,out_filename): 
 	"""This function calculates the IC of each annotation and normalizes it by the maximum possible IC.
 	The IC of an annotation is defined as the negative log of the frequency of the annotation in the pool of all annotations including duplicates.
 	The maximum IC score used to normalize the IC scores is -log(1/num_annotations).
@@ -14,14 +11,9 @@ def annotation_denominator(annotation_filename,ancestor_filename,out_filename): 
 
 	with open(annotation_filename,"r") as annotation_file:
 		annotations = [line.rstrip() for line in annotation_file]
-#	print len(annotations)
-#	unique_annotations = set(annotations)
-#	pattern = re.compile("UBERON_[0-9]*")
-#	children = getRelationships.get_children(ancestor_filename)	
 	# Initialize the dictionary for the annotation ICs.
 	annotation_ICs = collections.defaultdict(float)
 	# Calculate the maximum possible IC from the number of annotations.
-#	num_all_annotations = sum([len(i) for i in profiles.values()])
 	num_all_annotations = len(annotations)
 	max_IC = -np.log(1.0/num_all_annotations)
 	# Initialize a dictionary for the annotation counts.
