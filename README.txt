@@ -6,6 +6,12 @@ PI: Dr. Todd Vision
 
 Post-Doctoral Mentor: Dr. Prashanti Manda
 
+This repository contains two folders.
+1. Scripts: This folder contains all of the scripts used in the experiment.
+2. info: This folder contains files linked to each version of the code that describe the experimental design and results.
+
+A brief description of each script used in this experiment is below. If a script is not listed, it is currently not used in the experiment.
+
 Scripts:
 1. parseRealProfiles.py
 This script contains one function: parse_real_profiles.
